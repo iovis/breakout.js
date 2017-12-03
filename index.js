@@ -65,15 +65,18 @@ for (let i = 0; i < brickColumnCount; i++) {
   bricks[i] = [];
 
   for (let j = 0; j < brickRowCount; j++) {
-    bricks[i][j] = { x: 0, y: 0 };
+    bricks[i][j] = { x: 0, y: 0, status: 1 };
   }
 }
 
 function drawBricks() {
   for (let i = 0; i < brickColumnCount; i++) {
     for (let j = 0; j < brickRowCount; j++) {
+      if (bricks[i][j].status != 1) continue;
+
       let brickX = i * (brickWidth + brickPadding) + brickOffsetLeft;
       let brickY = j * (brickHeight + brickPadding) + brickOffsetTop;
+
       bricks[i][j].x = brickX;
       bricks[i][j].y = brickY;
       ctx.beginPath();
@@ -85,12 +88,28 @@ function drawBricks() {
   }
 }
 
+function collisionDetection() {
+  for (let i = 0; i < brickColumnCount; i++) {
+    for (let j = 0; j < brickRowCount; j++) {
+      let brick = bricks[i][j];
+
+      if (brick.status === 0) continue;
+
+      if (x > brick.x && x < brick.x + brickWidth && y > brick.y && y < brick.y + brickHeight) {
+        dy = -dy;
+        brick.status = 0;
+      }
+    }
+  }
+}
+
 // Game
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawBricks();
   drawBall();
   drawPaddle();
-  drawBricks();
+  collisionDetection();
 
   // Collision
   if (x > canvas.width - ballRadius || x < ballRadius) {
