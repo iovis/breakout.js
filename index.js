@@ -29,8 +29,12 @@ function draw() {
   if (y < ballRadius) {
     dy = -dy;
   } else if (y > canvas.height - ballRadius) {
-    alert('YOU SUCK!');
-    document.location.reload();
+    if (x > paddleX && x < paddleX + paddleWidth) {
+      dy = -dy;
+    } else {
+      alert('YOU SUCK!');
+      document.location.reload();
+    }
   }
 
   // Paddle movement
