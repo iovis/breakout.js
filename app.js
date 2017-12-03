@@ -1,5 +1,6 @@
 import Ball from './lib/ball';
 import Paddle from './lib/paddle';
+import Brick from './lib/brick';
 import ScoreBoard from './lib/score_board';
 
 const canvas = document.getElementById('game');
@@ -31,69 +32,59 @@ const paddle = new Paddle(canvas, paddleHeight, paddleWidth, paddleColor, paddle
 // Bricks
 const brickRowCount = 3;
 const brickColumnCount = 5;
-const brickWidth = 75;
 const brickHeight = 20;
-const brickPadding = 10;
-const brickOffsetTop = 30;
+const brickWidth = 75;
+const brickColor = '#dabeed';
+
 const brickOffsetLeft = 30;
+const brickOffsetTop = 30;
+const brickPadding = 10;
 
-let bricks = {};
+let bricks = [];
+
+// Build bricks
 for (let i = 0; i < brickColumnCount; i++) {
-  bricks[i] = [];
-
   for (let j = 0; j < brickRowCount; j++) {
-    bricks[i][j] = { x: 0, y: 0, status: 1 };
-  }
-}
+    let brickX = i * (brickWidth + brickPadding) + brickOffsetLeft;
+    let brickY = j * (brickHeight + brickPadding) + brickOffsetTop;
 
-function drawBricks() {
-  for (let i = 0; i < brickColumnCount; i++) {
-    for (let j = 0; j < brickRowCount; j++) {
-      if (bricks[i][j].status != 1) continue;
-
-      let brickX = i * (brickWidth + brickPadding) + brickOffsetLeft;
-      let brickY = j * (brickHeight + brickPadding) + brickOffsetTop;
-
-      bricks[i][j].x = brickX;
-      bricks[i][j].y = brickY;
-      ctx.beginPath();
-      ctx.rect(brickX, brickY, brickWidth, brickHeight);
-      ctx.fillStyle = '#dabeed';
-      ctx.fill();
-      ctx.closePath();
-    }
+    bricks.push(new Brick(canvas, brickHeight, brickWidth, brickColor, brickX, brickY));
   }
 }
 
 function collisionDetection() {
-  for (let i = 0; i < brickColumnCount; i++) {
-    for (let j = 0; j < brickRowCount; j++) {
-      let brick = bricks[i][j];
+  bricks.forEach(brick => {
+    if (brick.broken) return;
 
-      if (brick.status === 0) continue;
+    if (ball.x > brick.x - ball.radius
+      && ball.x < brick.x + brickWidth + ball.radius
+      && ball.y > brick.y - ball.radius
+      && ball.y < brick.y + brickHeight + ball.radius
+    ) {
+      ball.vy = -ball.vy;
+      brick.broken = true;
+      score_board.score++;
 
-      if (ball.x > brick.x - ball.radius && ball.x < brick.x + brickWidth + ball.radius && ball.y > brick.y - ball.radius && ball.y < brick.y + brickHeight + ball.radius) {
-        ball.vy = -ball.vy;
-        brick.status = 0;
-        score_board.score++;
-
-        if (score_board.score == brickRowCount * brickColumnCount) {
-          alert('YOU WIN!');
-          document.location.reload();
-        }
+      if (score_board.score == brickRowCount * brickColumnCount) {
+        alert('YOU WIN!');
+        document.location.reload();
       }
     }
-  }
+  });
 }
 
 // Game
 function draw() {
+  // Clear the screen every frame
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawBricks();
+
+  // Render stuff
+  bricks.forEach(brick => brick.draw());
   ball.draw();
   paddle.draw();
   score_board.drawScore();
   score_board.drawLives();
+
   collisionDetection();
 
   // Collision
