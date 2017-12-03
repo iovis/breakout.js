@@ -5,8 +5,8 @@ const ctx = canvas.getContext('2d');
 const ballRadius = 10;
 let x = canvas.width / 2;
 let y = canvas.height - 30;
-let dx = 2;
-let dy = -2;
+let dx = 5;
+let dy = -5;
 
 function drawBall() {
   ctx.beginPath();
@@ -22,16 +22,19 @@ function draw() {
   drawPaddle();
 
   // Collision
-  if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+  if (x > canvas.width - ballRadius || x < ballRadius) {
     dx = -dx;
   }
 
-  if (y + dy > canvas.height - ballRadius || y + dy < ballRadius) {
+  if (y < ballRadius) {
     dy = -dy;
+  } else if (y > canvas.height - ballRadius) {
+    alert('YOU SUCK!');
+    document.location.reload();
   }
 
   // Paddle movement
-  if (rightPressed && paddleX < canvas.width-paddleWidth) {
+  if (rightPressed && paddleX < canvas.width - paddleWidth) {
     paddleX += 7;
   } else if (leftPressed && paddleX > 0) {
     paddleX -= 7;
