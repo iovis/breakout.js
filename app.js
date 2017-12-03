@@ -133,13 +133,10 @@ function draw() {
     }
   }
 
-  // Paddle movement
   paddle.move();
-
-  ball.x += ball.vx;
-  ball.y += ball.vy;
+  ball.move();
 
   requestAnimationFrame(draw);
 }
 
-draw();
+requestAnimationFrame(draw);
