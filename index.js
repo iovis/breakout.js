@@ -98,9 +98,24 @@ function collisionDetection() {
       if (x > brick.x && x < brick.x + brickWidth && y > brick.y && y < brick.y + brickHeight) {
         dy = -dy;
         brick.status = 0;
+        score++;
+
+        if (score == brickRowCount * brickColumnCount) {
+          alert('YOU WIN!');
+          document.location.reload();
+        }
       }
     }
   }
+}
+
+// Score
+let score = 0;
+
+function drawScore() {
+  ctx.font = '16px Arial';
+  ctx.fillStyle = '#dabeed';
+  ctx.fillText(`Score: ${score}`, 8, 20);
 }
 
 // Game
@@ -109,6 +124,7 @@ function draw() {
   drawBricks();
   drawBall();
   drawPaddle();
+  drawScore();
   collisionDetection();
 
   // Collision
