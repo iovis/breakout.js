@@ -1,4 +1,5 @@
 import Ball from './lib/ball';
+import Paddle from './lib/paddle';
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -16,46 +17,12 @@ let ball = new Ball(canvas, ballRadius, ballColor, ballInitialX, ballInitialY, b
 // Paddle
 const paddleHeight = 10;
 const paddleWidth = 75;
+const paddleColor = '#dabeed';
+const paddleInitialX = (canvas.width - paddleWidth) / 2;
+const paddleInitialY = canvas.height - paddleHeight;
+const paddleVX = 7;
 
-let paddleX = (canvas.width - paddleWidth) / 2;
-let rightPressed = false;
-let leftPressed = false;
-
-function drawPaddle() {
-  ctx.beginPath();
-  ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
-  ctx.fillStyle = '#dabeed';
-  ctx.fill();
-  ctx.closePath();
-}
-
-document.addEventListener('keydown', keyDownHandler, false);
-document.addEventListener('keyup', keyUpHandler, false);
-document.addEventListener('mousemove', mouseMoveHandler, false);
-
-function keyDownHandler(e) {
-  if (e.keyCode == 39) {
-    rightPressed = true;
-  } else if (e.keyCode == 37) {
-    leftPressed = true;
-  }
-}
-
-function keyUpHandler(e) {
-  if (e.keyCode == 39) {
-    rightPressed = false;
-  } else if (e.keyCode == 37) {
-    leftPressed = false;
-  }
-}
-
-function mouseMoveHandler(e) {
-  let relativeX = e.clientX - canvas.offsetLeft;
-
-  if (relativeX > 0 && relativeX < canvas.width) {
-    paddleX = relativeX - paddleWidth / 2;
-  }
-}
+const paddle = new Paddle(canvas, paddleHeight, paddleWidth, paddleColor, paddleInitialX, paddleInitialY, paddleVX);
 
 // Bricks
 const brickRowCount = 3;
@@ -138,7 +105,7 @@ function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBricks();
   ball.draw();
-  drawPaddle();
+  paddle.draw();
   drawScore();
   drawLives();
   collisionDetection();
@@ -150,15 +117,15 @@ function draw() {
 
   if (ball.y < ball.radius) {
     ball.vy = -ball.vy;
-  } else if (ball.y > canvas.height - ball.radius - paddleHeight) {
-    if (ball.x > paddleX && ball.x < paddleX + paddleWidth) {
+  } else if (ball.y > canvas.height - ball.radius - paddle.height) {
+    if (ball.x > paddle.x && ball.x < paddle.x + paddle.width) {
       ball.vy = -ball.vy;
     } else {
       lives--;
 
       if (lives) {
-        paddleX = (canvas.width - paddleWidth) / 2;
         ball = new Ball(canvas, ballRadius, ballColor, ballInitialX, ballInitialY, ballInitialVX, ballInitialVY);
+        paddle.x = paddleInitialX;
       } else {
         alert('YOU SUCK!');
         document.location.reload();
@@ -167,11 +134,7 @@ function draw() {
   }
 
   // Paddle movement
-  if (rightPressed && paddleX < canvas.width - paddleWidth) {
-    paddleX += 7;
-  } else if (leftPressed && paddleX > 0) {
-    paddleX -= 7;
-  }
+  paddle.move();
 
   ball.x += ball.vx;
   ball.y += ball.vy;
