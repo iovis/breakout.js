@@ -5,6 +5,7 @@ import ScoreBoard from './lib/score_board';
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
+// Score Board
 const score_board = new ScoreBoard(canvas);
 
 // Ball
@@ -85,23 +86,14 @@ function collisionDetection() {
   }
 }
 
-// Lives
-let lives = 3;
-
-function drawLives() {
-  ctx.font = '16px Arial';
-  ctx.fillStyle = '#dabeed';
-  ctx.fillText(`Lives: ${lives}`, canvas.width - 65, 20);
-}
-
 // Game
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBricks();
   ball.draw();
   paddle.draw();
-  score_board.draw();
-  drawLives();
+  score_board.drawScore();
+  score_board.drawLives();
   collisionDetection();
 
   // Collision
@@ -115,9 +107,9 @@ function draw() {
     if (ball.x > paddle.x && ball.x < paddle.x + paddle.width) {
       ball.vy = -ball.vy;
     } else {
-      lives--;
+      score_board.lives--;
 
-      if (lives) {
+      if (score_board.lives) {
         ball = new Ball(canvas, ballRadius, ballColor, ballInitialX, ballInitialY, ballInitialVX, ballInitialVY);
         paddle.x = paddleInitialX;
       } else {
