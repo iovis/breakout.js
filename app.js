@@ -1,20 +1,17 @@
+import Ball from './lib/ball';
+
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
 // Ball
 const ballRadius = 10;
-let x = canvas.width / 2;
-let y = canvas.height - 30;
-let dx = 5;
-let dy = -5;
+const ballColor = '#dabeed';
+const ballInitialX = canvas.width / 2;
+const ballInitialY = canvas.height - 30;
+const ballInitialVX = 5;
+const ballInitialVY = -5;
 
-function drawBall() {
-  ctx.beginPath();
-  ctx.arc(x, y, ballRadius, 0, Math.PI*2);
-  ctx.fillStyle = '#dabeed';
-  ctx.fill();
-  ctx.closePath();
-}
+let ball = new Ball(canvas, ballRadius, ballColor, ballInitialX, ballInitialY, ballInitialVX, ballInitialVY);
 
 // Paddle
 const paddleHeight = 10;
@@ -104,8 +101,8 @@ function collisionDetection() {
 
       if (brick.status === 0) continue;
 
-      if (x > brick.x - ballRadius && x < brick.x + brickWidth + ballRadius && y > brick.y - ballRadius && y < brick.y + brickHeight + ballRadius) {
-        dy = -dy;
+      if (ball.x > brick.x - ball.radius && ball.x < brick.x + brickWidth + ball.radius && ball.y > brick.y - ball.radius && ball.y < brick.y + brickHeight + ball.radius) {
+        ball.vy = -ball.vy;
         brick.status = 0;
         score++;
 
@@ -140,31 +137,28 @@ function drawLives() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawBricks();
-  drawBall();
+  ball.draw();
   drawPaddle();
   drawScore();
   drawLives();
   collisionDetection();
 
   // Collision
-  if (x > canvas.width - ballRadius || x < ballRadius) {
-    dx = -dx;
+  if (ball.x > canvas.width - ball.radius || ball.x < ball.radius) {
+    ball.vx = -ball.vx;
   }
 
-  if (y < ballRadius) {
-    dy = -dy;
-  } else if (y > canvas.height - ballRadius - paddleHeight) {
-    if (x > paddleX && x < paddleX + paddleWidth) {
-      dy = -dy;
+  if (ball.y < ball.radius) {
+    ball.vy = -ball.vy;
+  } else if (ball.y > canvas.height - ball.radius - paddleHeight) {
+    if (ball.x > paddleX && ball.x < paddleX + paddleWidth) {
+      ball.vy = -ball.vy;
     } else {
       lives--;
 
       if (lives) {
-        x = canvas.width / 2;
-        y = canvas.height - 30;
-        dx = 5;
-        dy = -5;
         paddleX = (canvas.width - paddleWidth) / 2;
+        ball = new Ball(canvas, ballRadius, ballColor, ballInitialX, ballInitialY, ballInitialVX, ballInitialVY);
       } else {
         alert('YOU SUCK!');
         document.location.reload();
@@ -179,8 +173,8 @@ function draw() {
     paddleX -= 7;
   }
 
-  x += dx;
-  y += dy;
+  ball.x += ball.vx;
+  ball.y += ball.vy;
 
   requestAnimationFrame(draw);
 }
