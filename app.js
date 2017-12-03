@@ -1,8 +1,11 @@
 import Ball from './lib/ball';
 import Paddle from './lib/paddle';
+import ScoreBoard from './lib/score_board';
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
+
+const score_board = new ScoreBoard(canvas);
 
 // Ball
 const ballRadius = 10;
@@ -71,24 +74,15 @@ function collisionDetection() {
       if (ball.x > brick.x - ball.radius && ball.x < brick.x + brickWidth + ball.radius && ball.y > brick.y - ball.radius && ball.y < brick.y + brickHeight + ball.radius) {
         ball.vy = -ball.vy;
         brick.status = 0;
-        score++;
+        score_board.score++;
 
-        if (score == brickRowCount * brickColumnCount) {
+        if (score_board.score == brickRowCount * brickColumnCount) {
           alert('YOU WIN!');
           document.location.reload();
         }
       }
     }
   }
-}
-
-// Score
-let score = 0;
-
-function drawScore() {
-  ctx.font = '16px Arial';
-  ctx.fillStyle = '#dabeed';
-  ctx.fillText(`Score: ${score}`, 8, 20);
 }
 
 // Lives
@@ -106,7 +100,7 @@ function draw() {
   drawBricks();
   ball.draw();
   paddle.draw();
-  drawScore();
+  score_board.draw();
   drawLives();
   collisionDetection();
 
