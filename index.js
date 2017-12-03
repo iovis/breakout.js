@@ -34,7 +34,7 @@ function drawPaddle() {
 
 document.addEventListener('keydown', keyDownHandler, false);
 document.addEventListener('keyup', keyUpHandler, false);
-document.addEventListener("mousemove", mouseMoveHandler, false);
+document.addEventListener('mousemove', mouseMoveHandler, false);
 
 function keyDownHandler(e) {
   if (e.keyCode == 39) {
@@ -127,6 +127,15 @@ function drawScore() {
   ctx.fillText(`Score: ${score}`, 8, 20);
 }
 
+// Lives
+let lives = 3;
+
+function drawLives() {
+  ctx.font = '16px Arial';
+  ctx.fillStyle = '#dabeed';
+  ctx.fillText(`Lives: ${lives}`, canvas.width - 65, 20);
+}
+
 // Game
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -134,6 +143,7 @@ function draw() {
   drawBall();
   drawPaddle();
   drawScore();
+  drawLives();
   collisionDetection();
 
   // Collision
@@ -147,8 +157,18 @@ function draw() {
     if (x > paddleX && x < paddleX + paddleWidth) {
       dy = -dy;
     } else {
-      alert('YOU SUCK!');
-      document.location.reload();
+      lives--;
+
+      if (lives) {
+        x = canvas.width / 2;
+        y = canvas.height - 30;
+        dx = 5;
+        dy = -5;
+        paddleX = (canvas.width - paddleWidth) / 2;
+      } else {
+        alert('YOU SUCK!');
+        document.location.reload();
+      }
     }
   }
 
