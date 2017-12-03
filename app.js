@@ -1,6 +1,7 @@
 import Ball from './lib/ball';
-import Paddle from './lib/paddle';
 import Brick from './lib/brick';
+import CollisionEngine from './lib/collision_engine';
+import Paddle from './lib/paddle';
 import ScoreBoard from './lib/score_board';
 
 const canvas = document.getElementById('game');
@@ -17,7 +18,7 @@ const ballInitialY = canvas.height - 30;
 const ballInitialVX = 5;
 const ballInitialVY = -5;
 
-let ball = new Ball(canvas, ballRadius, ballColor, ballInitialX, ballInitialY, ballInitialVX, ballInitialVY);
+const ball = new Ball(canvas, ballRadius, ballColor, ballInitialX, ballInitialY, ballInitialVX, ballInitialVY);
 
 // Paddle
 const paddleHeight = 10;
@@ -52,25 +53,40 @@ for (let i = 0; i < brickColumnCount; i++) {
   }
 }
 
-function collisionDetection() {
-  bricks.forEach(brick => {
-    if (brick.broken) return;
+// CollisionEngine
+const collision_engine = new CollisionEngine(canvas, ball, paddle, bricks, score_board);
 
-    if (ball.x > brick.x - ball.radius
-      && ball.x < brick.x + brickWidth + ball.radius
-      && ball.y > brick.y - ball.radius
-      && ball.y < brick.y + brickHeight + ball.radius
-    ) {
-      ball.vy = -ball.vy;
-      brick.broken = true;
-      score_board.score++;
+// Events
+document.addEventListener('brickBroken', handleBrickBroken, false);
+document.addEventListener('gameWon', handleWin, false);
+document.addEventListener('lifeLost', handleLost, false);
 
-      if (score_board.score == brickRowCount * brickColumnCount) {
-        alert('YOU WIN!');
-        document.location.reload();
-      }
-    }
-  });
+function handleBrickBroken() {
+  score_board.score++;
+
+  if (score_board.score === bricks.length) {
+    document.dispatchEvent(new Event('gameWon'));
+  }
+}
+
+function handleLost() {
+  score_board.lives--;
+
+  if (score_board.lives) {
+    ball.x = ballInitialX;
+    ball.y = ballInitialY;
+    ball.vx = ballInitialVX;
+    ball.vy = ballInitialVY;
+    paddle.x = paddleInitialX;
+  } else {
+    alert('YOU SUCK!');
+    document.location.reload();
+  }
+}
+
+function handleWin() {
+  alert('YOU WIN!');
+  document.location.reload();
 }
 
 // Game
@@ -85,31 +101,10 @@ function draw() {
   score_board.drawScore();
   score_board.drawLives();
 
-  collisionDetection();
+  // Break stuff
+  collision_engine.run();
 
-  // Collision
-  if (ball.x > canvas.width - ball.radius || ball.x < ball.radius) {
-    ball.vx = -ball.vx;
-  }
-
-  if (ball.y < ball.radius) {
-    ball.vy = -ball.vy;
-  } else if (ball.y > canvas.height - ball.radius - paddle.height) {
-    if (ball.x > paddle.x && ball.x < paddle.x + paddle.width) {
-      ball.vy = -ball.vy;
-    } else {
-      score_board.lives--;
-
-      if (score_board.lives) {
-        ball = new Ball(canvas, ballRadius, ballColor, ballInitialX, ballInitialY, ballInitialVX, ballInitialVY);
-        paddle.x = paddleInitialX;
-      } else {
-        alert('YOU SUCK!');
-        document.location.reload();
-      }
-    }
-  }
-
+  // Move stuff
   paddle.move();
   ball.move();
 
