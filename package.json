@@ -4,13 +4,15 @@
   "description": "",
   "main": "app.js",
   "dependencies": {
+    "serve": "^6.4.1",
     "webpack-dev-server": "^2.9.5"
   },
   "devDependencies": {
     "webpack": "^3.9.1"
   },
   "scripts": {
-    "start": "webpack-dev-server",
+    "start": "serve ./ --single",
+    "dev": "webpack-dev-server",
     "build": "webpack"
   },
   "author": "",
