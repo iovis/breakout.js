@@ -104,7 +104,7 @@ function collisionDetection() {
 
       if (brick.status === 0) continue;
 
-      if (x > brick.x && x < brick.x + brickWidth && y > brick.y && y < brick.y + brickHeight) {
+      if (x > brick.x - ballRadius && x < brick.x + brickWidth + ballRadius && y > brick.y - ballRadius && y < brick.y + brickHeight + ballRadius) {
         dy = -dy;
         brick.status = 0;
         score++;
@@ -143,7 +143,7 @@ function draw() {
 
   if (y < ballRadius) {
     dy = -dy;
-  } else if (y > canvas.height - ballRadius) {
+  } else if (y > canvas.height - ballRadius - paddleHeight) {
     if (x > paddleX && x < paddleX + paddleWidth) {
       dy = -dy;
     } else {
@@ -165,4 +165,4 @@ function draw() {
   requestAnimationFrame(draw);
 }
 
-requestAnimationFrame(draw);
+draw();
